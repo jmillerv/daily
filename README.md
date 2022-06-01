@@ -12,3 +12,4 @@ When your system clock turns over your stand up data will disappear from the UI.
 - [ ] History 
 - [ ] Keyboard Navigation 
 - [ ] Clear entry fields on Clear function
+- [ ] Question Customization
