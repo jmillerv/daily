@@ -8,9 +8,3 @@ information for the day. If you use the `Clear` button, it will remove the data 
 
 When your system clock turns over your stand up data will disappear from the UI.
 
-## Roadmap
-- [ ] History 
-- [ ] Keyboard Navigation 
-- [ ] Clear entry fields on Clear function
-- [ ] Question Customization
-- [ ] Issue Reporting
