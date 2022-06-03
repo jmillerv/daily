@@ -9,6 +9,7 @@ import (
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
+	"github.com/jmillerv/daily/helpers"
 	"github.com/jmillerv/daily/internal/gui/panels"
 	"log"
 )
@@ -17,6 +18,7 @@ const (
 	preferenceCurrentPanel = "currentPanel"
 )
 
+var issueLink = widget.NewHyperlink("issues", helpers.ParseURL("https://github.com/jmillerv/daily/issues"))
 var themeButton = widget.NewButtonWithIcon("theme", theme.ColorPaletteIcon(), changeTheme)
 var themeBool = binding.NewBool()
 var topWindow fyne.Window
@@ -97,8 +99,9 @@ func createNav(setPanel func(panel panels.Panel), loadPrevious bool) fyne.Canvas
 		currentPref := a.Preferences().StringWithFallback(preferenceCurrentPanel, "home")
 		tree.Select(currentPref)
 	}
-
+	issueCenter := container.NewCenter(issueLink)
 	themes := container.New(layout.NewGridLayout(1),
+		issueCenter,
 		themeButton,
 	)
 	return container.NewBorder(nil, themes, nil, nil, tree)
