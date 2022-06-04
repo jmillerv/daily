@@ -1,14 +1,16 @@
 package panels
 
 import (
+	"log"
+	"strings"
+	"time"
+
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/data/binding"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
-	"log"
-	"time"
 )
 
 const (
@@ -76,9 +78,9 @@ func homeScreen(_ fyne.Window) fyne.CanvasObject {
 
 	// Button Elements
 	saveButton := widget.NewButtonWithIcon("Save", theme.DocumentSaveIcon(), func() {
-		_ = whatYouDidAnswer.Set(whatYouDidQuestion.Text)
-		_ = whatYouWillAnswer.Set(whatYouWillQuestion.Text)
-		_ = whatBlocksYouAnswer.Set(whatBlocksYouQuestion.Text)
+		_ = whatYouDidAnswer.Set(strings.Replace(whatYouDidQuestion.Text, "\n", " ", -1))
+		_ = whatYouWillAnswer.Set(strings.Replace(whatYouWillQuestion.Text, "\n", " ", -1))
+		_ = whatBlocksYouAnswer.Set(strings.Replace(whatBlocksYouQuestion.Text, "\n", " ", -1))
 		log.Println("saving stand up")
 	})
 	clearButton := widget.NewButtonWithIcon("Clear", theme.ContentClearIcon(), func() {
