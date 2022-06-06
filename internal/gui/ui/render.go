@@ -5,7 +5,6 @@ import (
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/data/binding"
-	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 	"github.com/jmillerv/daily/helpers"
 	"github.com/jmillerv/daily/internal/gui/panels"
@@ -14,10 +13,12 @@ import (
 
 const (
 	preferenceCurrentPanel = "currentPanel"
+	homePanel              = "home"
+	aboutPanel             = "about"
+	configurationPanel     = "configuration"
 )
 
 var issueLink = widget.NewHyperlink("issues", helpers.ParseURL("https://github.com/jmillerv/daily/issues"))
-var themeButton = widget.NewButtonWithIcon("theme", theme.ColorPaletteIcon(), changeTheme)
 var themeBool = binding.NewBool()
 var topWindow fyne.Window
 
@@ -52,13 +53,12 @@ func Render() {
 		content.Refresh()
 	}
 
-	panel := container.NewBorder(container.NewVBox(title, widget.NewSeparator()), nil, nil, nil, content)
+	//panel := container.NewBorder(container.NewVBox(title, widget.NewSeparator()), nil, nil, nil, content)
 	if fyne.CurrentDevice().IsMobile() {
 		w.SetContent(createNav(setPanel, false))
 	} else {
-		split := container.NewHSplit(createNav(setPanel, true), panel)
-		split.Offset = 0.2
-		w.SetContent(split)
+		desktopTabs := container.NewHScroll(createTabs())
+		w.SetContent(desktopTabs)
 	}
 
 	w.Resize(fyne.Size{Width: 800, Height: 560})

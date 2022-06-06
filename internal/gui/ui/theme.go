@@ -1,25 +1,24 @@
-package panels
+package ui
 
 import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
-	"github.com/jmillerv/daily/internal/gui/ui"
 )
 
-var ThemeButton = widget.NewButtonWithIcon("theme", theme.ColorPaletteIcon(), changeTheme)
+var themeButton = widget.NewButtonWithIcon("theme", theme.ColorPaletteIcon(), changeTheme)
 
 func changeTheme() {
 	a := fyne.CurrentApp()
-	b, _ := ui.themeBool.Get()
+	b, _ := themeBool.Get()
 	if !b {
 		a.Settings().SetTheme(theme.LightTheme())
-		_ = ui.themeBool.Set(true)
+		_ = themeBool.Set(true)
 		return
 	}
 	if b {
 		a.Settings().SetTheme(theme.DarkTheme())
-		_ = ui.themeBool.Set(false)
+		_ = themeBool.Set(false)
 		return
 	}
 }

@@ -10,11 +10,12 @@ type Panel struct {
 var (
 	// Panels defines metadata for each panel
 	Panels = map[string]Panel{
-		"home": {"Home", homeScreen},
+		"home":  {"Home", homeScreen},
+		"about": {"About", aboutScreen},
 	}
 
 	// PanelIndex defines how the panels are laid out in the index tree
 	PanelIndex = map[string][]string{
-		"": {"home"},
+		"": {"home", "about"},
 	}
 )
