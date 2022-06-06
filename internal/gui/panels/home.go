@@ -106,9 +106,9 @@ func homeScreen(_ fyne.Window) fyne.CanvasObject {
 
 	return container.NewVBox(
 		questions,
-		buttons,
 		today,
 		answers,
+		buttons,
 	)
 }
 
