@@ -1,6 +1,9 @@
 package ui
 
 import (
+	"log"
+	"time"
+
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
@@ -8,7 +11,6 @@ import (
 	"fyne.io/fyne/v2/widget"
 	"github.com/jmillerv/daily/helpers"
 	"github.com/jmillerv/daily/internal/gui/panels"
-	"log"
 )
 
 const (
@@ -62,5 +64,12 @@ func Render() {
 	}
 
 	w.Resize(fyne.Size{Width: 800, Height: 560})
+	go func() {
+		for range time.Tick(time.Second) {
+			panels.UpdateDate(panels.CurrentDate)
+			panels.Today.SetText(panels.CurrentDate)
+			panels.Today.Refresh()
+		}
+	}()
 	w.ShowAndRun()
 }
