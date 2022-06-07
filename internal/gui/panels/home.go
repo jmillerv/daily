@@ -1,14 +1,15 @@
 package panels
 
 import (
+	"log"
+	"time"
+
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/data/binding"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
-	"log"
-	"time"
 )
 
 const (
@@ -20,59 +21,50 @@ const (
 	wbyKey        = "_WBY"
 )
 
+// keys
 var whatYouDidKey string
 var whatYouWillKey string
 var whatBlocksYouKey string
 
+// question entries
+var whatYouDidQuestion *widget.Entry
+var whatYouWillQuestion *widget.Entry
+var whatBlocksYouQuestion *widget.Entry
+
+var questions *fyne.Container
+
+// answer bindings
+var whatYouDidAnswer binding.String
+var whatYouWillAnswer binding.String
+var whatBlocksYouAnswer binding.String
+
+// labels
+var whatYouDidLabel *canvas.Text
+var whatYouWillLabel *canvas.Text
+var whatBlocksYouLabel *canvas.Text
+
+// date
+var currentDate string
+
 func homeScreen(_ fyne.Window) fyne.CanvasObject {
 	app := fyne.CurrentApp()
 
+	// keys
+	setKeys()
+
 	// Question elements
-	whatYouDidQuestion := widget.NewMultiLineEntry()
-	whatYouDidQuestion.SetPlaceHolder(whatYouDid)
-
-	whatYouWillQuestion := widget.NewMultiLineEntry()
-	whatYouWillQuestion.SetPlaceHolder(whatYouWill)
-
-	whatBlocksYouQuestion := widget.NewMultiLineEntry()
-	whatBlocksYouQuestion.SetPlaceHolder(whatBlocksYou)
+	setQuestions()
 
 	// labels
-	whatYouDidLabel := canvas.NewText(whatYouDidQuestion.Text, theme.FocusColor())
-	whatYouDidLabel.Alignment = fyne.TextAlignCenter
-	whatYouWillLabel := canvas.NewText(whatYouWillQuestion.Text, theme.FocusColor())
-	whatYouWillLabel.Alignment = fyne.TextAlignCenter
-	whatBlocksYouLabel := canvas.NewText(whatBlocksYouQuestion.Text, theme.FocusColor())
-	whatBlocksYouLabel.Alignment = fyne.TextAlignCenter
+	setLabels()
 
 	// Bindings & Data
-	currentDate := time.Now().Format("01-02-2006")
+	currentDate = time.Now().Format("01-02-2006")
 	today := widget.NewLabel(currentDate)
 	today.Alignment = fyne.TextAlignCenter
 
-	whatYouDidKey = currentDate + wydKey
-	whatYouDidAnswer := binding.BindPreferenceString(whatYouDidKey, app.Preferences())
-	whatYouDidAnswer.AddListener(
-		binding.NewDataListener(func() {
-			whatYouDidLabel.Text, _ = whatYouDidAnswer.Get()
-			whatYouDidLabel.Refresh()
-		}))
-
-	whatYouWillKey = currentDate + wywKey
-	whatYouWillAnswer := binding.BindPreferenceString(whatYouWillKey, app.Preferences())
-	whatYouWillAnswer.AddListener(
-		binding.NewDataListener(func() {
-			whatYouWillLabel.Text, _ = whatYouWillAnswer.Get()
-			whatYouWillLabel.Refresh()
-		}))
-
-	whatBlocksYouKey = currentDate + wbyKey
-	whatBlocksYouAnswer := binding.BindPreferenceString(whatBlocksYouKey, app.Preferences())
-	whatBlocksYouAnswer.AddListener(
-		binding.NewDataListener(func() {
-			whatBlocksYouLabel.Text, _ = whatBlocksYouAnswer.Get()
-			whatBlocksYouLabel.Refresh()
-		}))
+	// answers
+	setAnswers(app)
 
 	// Button Elements
 	saveButton := widget.NewButtonWithIcon("Save", theme.DocumentSaveIcon(), func() {
@@ -94,7 +86,7 @@ func homeScreen(_ fyne.Window) fyne.CanvasObject {
 	// Layout
 
 	questionRows := container.NewGridWithRows(3, whatYouDidQuestion, whatYouWillQuestion, whatBlocksYouQuestion)
-	questions := container.NewGridWithColumns(1, questionRows)
+	questions = container.NewGridWithColumns(1, questionRows)
 	answers := container.NewCenter(container.NewVBox(
 		widget.NewLabel(whatYouDid),
 		whatYouDidLabel,
@@ -112,9 +104,70 @@ func homeScreen(_ fyne.Window) fyne.CanvasObject {
 	)
 }
 
+// setKeys creates the keys for fyne's key/value store
+func setKeys() {
+	whatYouDidKey = currentDate + wydKey
+	whatYouWillKey = currentDate + wywKey
+	whatBlocksYouKey = currentDate + wbyKey
+}
+
+// setLabels
+func setLabels() {
+	whatYouDidLabel = canvas.NewText(whatYouDidQuestion.Text, theme.FocusColor())
+	whatYouDidLabel.Alignment = fyne.TextAlignCenter
+	whatYouWillLabel = canvas.NewText(whatYouWillQuestion.Text, theme.FocusColor())
+	whatYouWillLabel.Alignment = fyne.TextAlignCenter
+	whatBlocksYouLabel = canvas.NewText(whatBlocksYouQuestion.Text, theme.FocusColor())
+	whatBlocksYouLabel.Alignment = fyne.TextAlignCenter
+
+}
+
+// setAnswers()
+func setAnswers(app fyne.App) {
+	whatYouDidAnswer = binding.BindPreferenceString(whatYouDidKey, app.Preferences())
+	whatYouDidAnswer.AddListener(
+		binding.NewDataListener(func() {
+			whatYouDidLabel.Text, _ = whatYouDidAnswer.Get()
+			whatYouDidLabel.Refresh()
+		}))
+
+	whatYouWillAnswer = binding.BindPreferenceString(whatYouWillKey, app.Preferences())
+	whatYouWillAnswer.AddListener(
+		binding.NewDataListener(func() {
+			whatYouWillLabel.Text, _ = whatYouWillAnswer.Get()
+			whatYouWillLabel.Refresh()
+		}))
+
+	whatBlocksYouAnswer = binding.BindPreferenceString(whatBlocksYouKey, app.Preferences())
+	whatBlocksYouAnswer.AddListener(
+		binding.NewDataListener(func() {
+			whatBlocksYouLabel.Text, _ = whatBlocksYouAnswer.Get()
+			whatBlocksYouLabel.Refresh()
+		}))
+
+}
+
+// setQuestions puts the question into a base state with placeholder suggestions
+func setQuestions() {
+	whatYouDidQuestion = widget.NewMultiLineEntry()
+	whatYouDidQuestion.SetPlaceHolder(whatYouDid)
+
+	whatYouWillQuestion = widget.NewMultiLineEntry()
+	whatYouWillQuestion.SetPlaceHolder(whatYouWill)
+
+	whatBlocksYouQuestion = widget.NewMultiLineEntry()
+	whatBlocksYouQuestion.SetPlaceHolder(whatBlocksYou)
+
+}
+
+// clear removes the values for the keys associated with the day's standup
 func clear() {
+	whatYouDidQuestion.Text = ""
+	whatYouWillQuestion.Text = ""
+	whatBlocksYouQuestion.Text = ""
 	app := fyne.CurrentApp()
 	app.Preferences().RemoveValue(whatYouDidKey)
 	app.Preferences().RemoveValue(whatYouWillKey)
 	app.Preferences().RemoveValue(whatBlocksYouKey)
+	questions.Refresh()
 }
