@@ -13,12 +13,13 @@ import (
 )
 
 const (
-	whatYouDid    = "What did you do yesterday?"
-	wydKey        = "_WYD"
-	whatYouWill   = "What will you do today?"
-	wywKey        = "_WYW"
-	whatBlocksYou = "Is anything blocking your progress?"
-	wbyKey        = "_WBY"
+	whatYouDid        = "What did you do yesterday?"
+	wydKey            = "_WYD"
+	whatYouWill       = "What will you do today?"
+	wywKey            = "_WYW"
+	whatBlocksYou     = "Is anything blocking your progress?"
+	wbyKey            = "_WBY"
+	defaultDateFormat = "01-02-2006"
 )
 
 // keys
@@ -59,7 +60,12 @@ func homeScreen(_ fyne.Window) fyne.CanvasObject {
 	setLabels()
 
 	// Bindings & Data
-	currentDate = time.Now().Format("01-02-2006")
+	currentDate = time.Now().Format(defaultDateFormat)
+	go func() {
+		for range time.Tick(time.Second) {
+			updateDate(currentDate)
+		}
+	}()
 	today := widget.NewLabel(currentDate)
 	today.Alignment = fyne.TextAlignCenter
 
@@ -170,4 +176,11 @@ func clear() {
 	app.Preferences().RemoveValue(whatYouWillKey)
 	app.Preferences().RemoveValue(whatBlocksYouKey)
 	questions.Refresh()
+}
+
+func updateDate(setDate string) {
+	today := time.Now().Format("01-02-2006")
+	if setDate != today {
+		setDate = today
+	}
 }
