@@ -12,7 +12,7 @@ func Test_updateDate(t *testing.T) {
 		setDate      string
 		expectedDate string
 	}
-	today := time.Now().Format(defaultDateFormat)
+	todayDate := time.Now().Format(defaultDateFormat)
 	yesterday := time.Now().AddDate(0, 0, -1).Format(defaultDateFormat)
 	tests := []struct {
 		name string
@@ -20,17 +20,17 @@ func Test_updateDate(t *testing.T) {
 	}{
 		{
 			name: "Date Is Today",
-			args: &args{setDate: today, expectedDate: today},
+			args: &args{setDate: todayDate, expectedDate: todayDate},
 		},
 		{
 			name: "Date Is Not Today",
-			args: &args{setDate: yesterday, expectedDate: today},
+			args: &args{setDate: yesterday, expectedDate: todayDate},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			updateDate(tt.args.setDate)
-			is.Equal(today, tt.args.expectedDate)
+			UpdateDate(tt.args.setDate)
+			is.Equal(todayDate, tt.args.expectedDate)
 		})
 	}
 }
