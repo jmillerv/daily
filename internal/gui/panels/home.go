@@ -13,12 +13,13 @@ import (
 )
 
 const (
-	whatYouDid    = "What did you do yesterday?"
-	wydKey        = "_WYD"
-	whatYouWill   = "What will you do today?"
-	wywKey        = "_WYW"
-	whatBlocksYou = "Is anything blocking your progress?"
-	wbyKey        = "_WBY"
+	whatYouDid        = "What did you do yesterday?"
+	wydKey            = "_WYD"
+	whatYouWill       = "What will you do Today?"
+	wywKey            = "_WYW"
+	whatBlocksYou     = "Is anything blocking your progress?"
+	wbyKey            = "_WBY"
+	defaultDateFormat = "01-02-2006"
 )
 
 // keys
@@ -44,7 +45,8 @@ var whatYouWillLabel *canvas.Text
 var whatBlocksYouLabel *canvas.Text
 
 // date
-var currentDate string
+var CurrentDate string
+var Today *widget.Label
 
 func homeScreen(_ fyne.Window) fyne.CanvasObject {
 	app := fyne.CurrentApp()
@@ -59,9 +61,10 @@ func homeScreen(_ fyne.Window) fyne.CanvasObject {
 	setLabels()
 
 	// Bindings & Data
-	currentDate = time.Now().Format("01-02-2006")
-	today := widget.NewLabel(currentDate)
-	today.Alignment = fyne.TextAlignCenter
+	// Set Date
+	CurrentDate = time.Now().Format("01-02-2006")
+	Today = widget.NewLabel(CurrentDate)
+	Today.Alignment = fyne.TextAlignCenter
 
 	// answers
 	setAnswers(app)
@@ -98,7 +101,7 @@ func homeScreen(_ fyne.Window) fyne.CanvasObject {
 
 	return container.NewVBox(
 		questions,
-		today,
+		Today,
 		answers,
 		buttons,
 	)
@@ -106,9 +109,9 @@ func homeScreen(_ fyne.Window) fyne.CanvasObject {
 
 // setKeys creates the keys for fyne's key/value store
 func setKeys() {
-	whatYouDidKey = currentDate + wydKey
-	whatYouWillKey = currentDate + wywKey
-	whatBlocksYouKey = currentDate + wbyKey
+	whatYouDidKey = CurrentDate + wydKey
+	whatYouWillKey = CurrentDate + wywKey
+	whatBlocksYouKey = CurrentDate + wbyKey
 }
 
 // setLabels
@@ -170,4 +173,11 @@ func clear() {
 	app.Preferences().RemoveValue(whatYouWillKey)
 	app.Preferences().RemoveValue(whatBlocksYouKey)
 	questions.Refresh()
+}
+
+func UpdateDate(setDate string) {
+	now := time.Now().Format("01-02-2006")
+	if setDate != now {
+		CurrentDate = now
+	}
 }
