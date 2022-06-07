@@ -1,14 +1,14 @@
 package helpers
 
 import (
-	"fyne.io/fyne/v2"
+	"log"
 	"net/url"
 )
 
 func ParseURL(urlStr string) *url.URL {
 	link, err := url.Parse(urlStr)
 	if err != nil {
-		fyne.LogError("Could not parse URL", err)
+		log.Println("Could not parse URL", err)
 	}
 
 	return link
