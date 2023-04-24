@@ -1,10 +1,10 @@
 package ui
 
 import (
+	"fyne.io/fyne/v2"
 	"log"
 	"time"
 
-	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/data/binding"
@@ -50,7 +50,6 @@ func Render() {
 			return
 		}
 		title.SetText(p.Title)
-
 		content.Objects = []fyne.CanvasObject{p.View(w)}
 		content.Refresh()
 	}

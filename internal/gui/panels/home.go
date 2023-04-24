@@ -1,6 +1,7 @@
 package panels
 
 import (
+	"fyne.io/fyne/v2/driver/desktop"
 	"log"
 	"time"
 
@@ -22,15 +23,28 @@ const (
 	defaultDateFormat = "01-02-2006"
 )
 
+type questionEntry struct {
+	entry *widget.Entry
+}
+
+func (q *questionEntry) TypedShortcut(s fyne.Shortcut) {
+	if _, ok := s.(*desktop.CustomShortcut); !ok {
+		log.Println("shortcut test")
+		q.entry.TypedShortcut(s)
+		return
+	}
+	log.Println("tab shortcut")
+}
+
 // keys
 var whatYouDidKey string
 var whatYouWillKey string
 var whatBlocksYouKey string
 
 // question entries
-var whatYouDidQuestion *widget.Entry
-var whatYouWillQuestion *widget.Entry
-var whatBlocksYouQuestion *widget.Entry
+var whatYouDidQuestion *questionEntry
+var whatYouWillQuestion *questionEntry
+var whatBlocksYouQuestion *questionEntry
 
 var questions *fyne.Container
 
@@ -44,13 +58,15 @@ var whatYouDidLabel *canvas.Text
 var whatYouWillLabel *canvas.Text
 var whatBlocksYouLabel *canvas.Text
 
+var ctrlTab desktop.CustomShortcut
+
 // date
 var CurrentDate string
 var Today *widget.Label
 
 func homeScreen(_ fyne.Window) fyne.CanvasObject {
 	app := fyne.CurrentApp()
-
+	ctrlTab = desktop.CustomShortcut{KeyName: fyne.KeyTab, Modifier: desktop.ControlModifier}
 	// keys
 	setKeys()
 
@@ -70,25 +86,12 @@ func homeScreen(_ fyne.Window) fyne.CanvasObject {
 	setAnswers(app)
 
 	// Button Elements
-	saveButton := widget.NewButtonWithIcon("Save", theme.DocumentSaveIcon(), func() {
-		_ = whatYouDidAnswer.Set(whatYouDidQuestion.Text)
-		_ = whatYouWillAnswer.Set(whatYouWillQuestion.Text)
-		_ = whatBlocksYouAnswer.Set(whatBlocksYouQuestion.Text)
-		log.Println("saving stand up")
-	})
-	clearButton := widget.NewButtonWithIcon("Clear", theme.ContentClearIcon(), func() {
-		clear()
-		// TODO Find a better way to implement this
-		_ = whatYouDidAnswer.Set("")
-		_ = whatYouWillAnswer.Set("")
-		_ = whatBlocksYouAnswer.Set("")
-		log.Println("clearing stand up")
-	})
+	saveButton := createSaveButton()
+	clearButton := createClearButton()
 	buttons := container.NewGridWithColumns(2, clearButton, saveButton)
 
 	// Layout
-
-	questionRows := container.NewGridWithRows(3, whatYouDidQuestion, whatYouWillQuestion, whatBlocksYouQuestion)
+	questionRows := container.NewGridWithRows(3, whatYouDidQuestion.entry, whatYouWillQuestion.entry, whatBlocksYouQuestion.entry)
 	questions = container.NewGridWithColumns(1, questionRows)
 	answers := container.NewCenter(container.NewVBox(
 		widget.NewLabel(whatYouDid),
@@ -107,6 +110,34 @@ func homeScreen(_ fyne.Window) fyne.CanvasObject {
 	)
 }
 
+func newQuestionEntry() *questionEntry {
+	newEntry := widget.NewMultiLineEntry()
+	newEntry.TypedShortcut(&ctrlTab)
+	return &questionEntry{entry: newEntry}
+}
+
+// createSaveButton returns a button that sets the answers.
+func createSaveButton() *widget.Button {
+	return widget.NewButtonWithIcon("Save", theme.DocumentSaveIcon(), func() {
+		_ = whatYouDidAnswer.Set(whatYouDidQuestion.entry.Text)
+		_ = whatYouWillAnswer.Set(whatYouWillQuestion.entry.Text)
+		_ = whatBlocksYouAnswer.Set(whatBlocksYouQuestion.entry.Text)
+		log.Println("saving stand up")
+	})
+}
+
+// createClearButton returns the button that runs the clear() function and resets the answers.
+func createClearButton() *widget.Button {
+	return widget.NewButtonWithIcon("Clear", theme.ContentClearIcon(), func() {
+		clear()
+		// TODO Find a better way to implement this
+		_ = whatYouDidAnswer.Set("")
+		_ = whatYouWillAnswer.Set("")
+		_ = whatBlocksYouAnswer.Set("")
+		log.Println("clearing stand up")
+	})
+}
+
 // setKeys creates the keys for fyne's key/value store
 func setKeys() {
 	whatYouDidKey = CurrentDate + wydKey
@@ -116,11 +147,11 @@ func setKeys() {
 
 // setLabels
 func setLabels() {
-	whatYouDidLabel = canvas.NewText(whatYouDidQuestion.Text, theme.FocusColor())
+	whatYouDidLabel = canvas.NewText(whatYouDidQuestion.entry.Text, theme.FocusColor())
 	whatYouDidLabel.Alignment = fyne.TextAlignCenter
-	whatYouWillLabel = canvas.NewText(whatYouWillQuestion.Text, theme.FocusColor())
+	whatYouWillLabel = canvas.NewText(whatYouWillQuestion.entry.Text, theme.FocusColor())
 	whatYouWillLabel.Alignment = fyne.TextAlignCenter
-	whatBlocksYouLabel = canvas.NewText(whatBlocksYouQuestion.Text, theme.FocusColor())
+	whatBlocksYouLabel = canvas.NewText(whatBlocksYouQuestion.entry.Text, theme.FocusColor())
 	whatBlocksYouLabel.Alignment = fyne.TextAlignCenter
 
 }
@@ -152,22 +183,22 @@ func setAnswers(app fyne.App) {
 
 // setQuestions puts the question into a base state with placeholder suggestions
 func setQuestions() {
-	whatYouDidQuestion = widget.NewMultiLineEntry()
-	whatYouDidQuestion.SetPlaceHolder(whatYouDid)
+	whatYouDidQuestion = newQuestionEntry()
+	whatYouDidQuestion.entry.SetPlaceHolder(whatYouDid)
 
-	whatYouWillQuestion = widget.NewMultiLineEntry()
-	whatYouWillQuestion.SetPlaceHolder(whatYouWill)
+	whatYouWillQuestion = newQuestionEntry()
+	whatYouWillQuestion.entry.SetPlaceHolder(whatYouWill)
 
-	whatBlocksYouQuestion = widget.NewMultiLineEntry()
-	whatBlocksYouQuestion.SetPlaceHolder(whatBlocksYou)
+	whatBlocksYouQuestion = newQuestionEntry()
+	whatBlocksYouQuestion.entry.SetPlaceHolder(whatBlocksYou)
 
 }
 
 // clear removes the values for the keys associated with the day's standup
 func clear() {
-	whatYouDidQuestion.Text = ""
-	whatYouWillQuestion.Text = ""
-	whatBlocksYouQuestion.Text = ""
+	whatYouDidQuestion.entry.Text = ""
+	whatYouWillQuestion.entry.Text = ""
+	whatBlocksYouQuestion.entry.Text = ""
 	app := fyne.CurrentApp()
 	app.Preferences().RemoveValue(whatYouDidKey)
 	app.Preferences().RemoveValue(whatYouWillKey)
