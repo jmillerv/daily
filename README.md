@@ -1,6 +1,9 @@
 # daily
 A Cross-Platform Stand Up Bot
 
+## Archived
+Development moved to [Codeberg](https://codeberg.org/jmillerv/daily)
+
 ## Usage
 
 The data is stored locally using fyne's preferences API. If you use the `Save` button, it will persist your stand up
